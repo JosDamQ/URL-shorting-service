@@ -5,8 +5,8 @@ const mongoose = require('mongoose')
 const shortenSchema = new mongoose.Schema({
     url: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        required: [true, 'URL is required'],
     },
     shortUrl: {
         type: String,
@@ -20,7 +20,14 @@ const shortenSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    accessCount: {
+        type: Number,
+        default: 0
     }
+}, {
+    timestamps: true,
+    versionKey: false
 })
 
 module.exports = mongoose.model('Shorten', shortenSchema)
