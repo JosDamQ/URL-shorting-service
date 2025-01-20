@@ -51,3 +51,26 @@ exports.getUrl = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.updateUrl = async (req, res, next) => {
+    try{
+        const { shortUrl } = req.params
+        const data = req.body
+
+        if(!shortUrl) return res.status(400).send({ message: 'Short URL is required' })
+
+        const url = await Shorten.findOne({ shortUrl }).select('-accessCount')
+        if(!url) return res.status(404).send({ message: 'URL not found' })
+
+        if(!data.url) return res.status(400).send({ message: 'New URL is required' })
+
+        if(!validateURL(data.url)) return res.status(400).send({ message: 'Invalid URL format' })
+
+        await url.updateOne({ url: data.url })
+
+        return res.status(200).send({ message: 'URL updated', url })
+        
+    }catch(error){
+        next(error)
+    }
+}
