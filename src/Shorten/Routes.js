@@ -3,10 +3,10 @@
 const express = require('express')
 const router = express.Router()
 
-const { test } = require('./Controller')
+const { createShorten } = require('./Controller')
 
 
 // Rutas
-router.get('/test', test)
+router.post('/shorten', createShorten)
 
 module.exports = router
