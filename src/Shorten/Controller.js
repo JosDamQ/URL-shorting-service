@@ -27,3 +27,27 @@ exports.createShorten = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.getUrl = async (req, res, next) => {
+    try{
+        const { shortUrl } = req.params
+        if(!shortUrl) return res.status(400).send({ message: 'Short URL is required' })
+        
+        const url = await Shorten.findOne/*().select*/({ shortUrl })
+        if(!url) return res.status(404).send({ message: 'URL not found' })
+
+        const urlObject = {
+            id: url._id,
+            url: url.url,
+            shortUrl: url.shortUrl,
+            createdAt: url.createdAt,
+            updatedAt: url.updatedAt,
+        }
+
+        url.accessCount++
+        await url.save()
+        return res.status(200).send({ message: 'URL found', url: urlObject })
+    }catch(error) {
+        next(error)
+    }
+}
