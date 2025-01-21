@@ -33,7 +33,7 @@ exports.getUrl = async (req, res, next) => {
         const { shortUrl } = req.params
         if(!shortUrl) return res.status(400).send({ message: 'Short URL is required' })
         
-        const url = await Shorten.findOne/*().select*/({ shortUrl })
+        const url = await Shorten.findOne({ shortUrl })
         if(!url) return res.status(404).send({ message: 'URL not found' })
 
         const urlObject = {
@@ -46,6 +46,9 @@ exports.getUrl = async (req, res, next) => {
 
         url.accessCount++
         await url.save()
+
+        // TODO: Implementar el redireccionamiento a la URL correcta
+
         return res.status(200).send({ message: 'URL found', url: urlObject })
     }catch(error) {
         next(error)
@@ -71,6 +74,37 @@ exports.updateUrl = async (req, res, next) => {
         return res.status(200).send({ message: 'URL updated', url })
         
     }catch(error){
+        next(error)
+    }
+}
+
+exports.deleteUrl = async (req, res, next) => {
+    try{
+        const { shortUrl } = req.params
+        if(!shortUrl) return res.status(400).send({ message: 'Short URL is required' })
+
+        const url = await Shorten.findOne({ shortUrl })
+        if(!url) return res.status(404).send({ message: 'URL not found' })
+
+        await url.deleteOne();
+
+        return res.status(200).send({ message: 'URL deleted' })
+
+    }catch (error){
+        next(error)
+    }
+}
+
+exports.getStatistics = async (req, res, next) => {
+    try{
+        const { shortUrl } = req.params
+        if(!shortUrl) return res.status(400).send({ message: 'Short URL is required' })
+
+        const url = await Shorten.findOne({ shortUrl })
+        if(!url) return res.status(404).send({ message: 'URL not found' })
+
+        return res.status(200).send({ message: 'URL statistics', url })
+    }catch (error){
         next(error)
     }
 }
